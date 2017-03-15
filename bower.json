@@ -1,0 +1,19 @@
+{
+  "name": "loaner",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^2.5.0",
+    "purescript-console": "^2.0.0",
+    "purescript-maybe": "^2.1.1",
+    "purescript-node-fs-aff": "^3.0.0",
+    "purescript-stringutils": "^0.0.4"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^2.0.0"
+  }
+}
