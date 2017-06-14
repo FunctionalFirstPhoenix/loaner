@@ -1,6 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (..)
+import Html exposing (beginnerProgram, div, button, text, input, br, p)
+import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Date exposing (Date, fromTime)
 import Date.Extra.Config.Config_en_us as EnUs
@@ -54,17 +55,65 @@ statusToString status =
 
 
 main =
+    beginnerProgram { model = testAccount, view = view, update = update }
+
+
+accountTypeButtons currentAccountType =
+    div []
+        [ input
+            [ type_ "radio"
+            , name "account_type"
+            , checked (currentAccountType == Normal)
+            ]
+            []
+        , text "Normal"
+        , br [] []
+        , input
+            [ type_ "radio"
+            , name "account_type"
+            , checked (currentAccountType == Gold)
+            ]
+            []
+        , text "Gold"
+        , br [] []
+        , input
+            [ type_ "radio"
+            , name "account_type"
+            , checked (currentAccountType == Platinum)
+            ]
+            []
+        , text "Platinum"
+        ]
+
+
+view model =
+    div []
+        [ renderAccount model
+        , accountTypeButtons model.accountType
+        ]
+
+
+type Msg
+    = Increment
+    | Decrement
+
+
+update msg model =
+    model
+
+
+renderAccount account =
     div [ id "Title", style [ ( "backgroundColor", "yellow" ) ] ]
         [ p []
-            [ text <| "Account Owner: " ++ (fullName testAccount.owner)
+            [ text <| "Account Owner: " ++ (fullName account.owner)
             ]
         , p []
-            [ text <| "Balance: " ++ (toString testAccount.balance)
+            [ text <| "Balance: " ++ (toString account.balance)
             ]
         , p []
-            [ text <| "Account Type: " ++ (toString testAccount.accountType)
+            [ text <| "Account Type: " ++ (toString account.accountType)
             ]
         , p []
-            [ text <| "Status: " ++ (statusToString testAccount.status)
+            [ text <| "Status: " ++ (statusToString account.status)
             ]
         ]
