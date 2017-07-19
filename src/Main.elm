@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (beginnerProgram, div, button, text, input, br, p)
-import Html.Events exposing (onClick)
+import Html exposing (beginnerProgram, div, button, text, input, br, p, Html)
+import Html.Events exposing (onClick, onCheck)
 import Html.Attributes exposing (..)
 import Date exposing (Date, fromTime)
 import Date.Extra.Config.Config_en_us as EnUs
@@ -13,7 +13,7 @@ testAccount : Account
 testAccount =
     { owner = { firstName = "Bob", lastName = "Smith" }
     , balance = 100
-    , accountType = Gold
+    , accountType = Platinum
     , status = Suspended (fromTime 1175820019000) Voluntary
 
     -- , status = Closed (fromTime 1175820019000)
@@ -59,33 +59,37 @@ main =
 
 
 accountTypeButtons currentAccountType =
-    div []
-        [ input
-            [ type_ "radio"
-            , name "account_type"
-            , checked (currentAccountType == Normal)
+    let
+        checkedStatusToMessage : AccountType -> Bool -> Msg
+        checkedStatusToMessage accountType status =
+            if status then
+                ChangeAccountType accountType
+            else
+                NoOp
+
+        makeInput : AccountType -> Html Msg
+        makeInput accountType =
+            input
+                [ type_ "radio"
+                , name "account_type"
+                , checked (currentAccountType == accountType)
+                , onCheck (checkedStatusToMessage accountType)
+                ]
+                []
+    in
+        div []
+            [ makeInput Normal
+            , text "Normal"
+            , br [] []
+            , makeInput Gold
+            , text "Gold"
+            , br [] []
+            , makeInput Platinum
+            , text "Platinum"
             ]
-            []
-        , text "Normal"
-        , br [] []
-        , input
-            [ type_ "radio"
-            , name "account_type"
-            , checked (currentAccountType == Gold)
-            ]
-            []
-        , text "Gold"
-        , br [] []
-        , input
-            [ type_ "radio"
-            , name "account_type"
-            , checked (currentAccountType == Platinum)
-            ]
-            []
-        , text "Platinum"
-        ]
 
 
+view : Model -> Html Msg
 view model =
     div []
         [ renderAccount model
@@ -94,16 +98,46 @@ view model =
 
 
 type Msg
-    = Increment
-    | Decrement
+    = ChangeAccountType AccountType
+    | NoOp
 
 
+type alias Model =
+    Account
+
+
+update : Msg -> Model -> Model
 update msg model =
-    model
+    case msg of
+        ChangeAccountType theUpdatedAccountType ->
+            { model | accountType = theUpdatedAccountType }
+
+        NoOp ->
+            model
+
+
+accountBackgroundColor : AccountType -> String
+accountBackgroundColor accountType =
+    case accountType of
+        Normal ->
+            "white"
+
+        Gold ->
+            "yellow"
+
+        Platinum ->
+            "grey"
 
 
 renderAccount account =
-    div [ id "Title", style [ ( "backgroundColor", "yellow" ) ] ]
+    div
+        [ id "Title"
+        , style
+            [ ( "backgroundColor"
+              , accountBackgroundColor account.accountType
+              )
+            ]
+        ]
         [ p []
             [ text <| "Account Owner: " ++ (fullName account.owner)
             ]
