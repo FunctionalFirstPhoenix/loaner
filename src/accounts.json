@@ -1,0 +1,23 @@
+{
+  "accounts": [
+      {
+        "owner": { firstName: "Bob", lastName: "Smith" },
+        "balance": 100,
+        "accountType": "Gold",
+        "status": {
+          "type": "Suspended",
+          "timestamp": 1175820019000,
+          "reason": "Voluntary"
+        }
+      },
+      {
+        "owner": { firstName: "Janet", lastName: "Smyth" },
+        "balance": 3000,
+        "accountType": "Platinum",
+        "status": {
+          "type": "Active",
+          "timestamp": 1175820019000
+        }
+      }
+  ]
+}

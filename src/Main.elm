@@ -9,15 +9,19 @@ import Date.Extra.Format as Format
 import Domain exposing (..)
 
 
-testAccount : Account
-testAccount =
-    { owner = { firstName = "Bob", lastName = "Smith" }
-    , balance = 100
-    , accountType = Platinum
-    , status = Suspended (fromTime 1175820019000) Voluntary
-
-    -- , status = Closed (fromTime 1175820019000)
-    }
+accounts : List Account
+accounts =
+    [ { owner = { firstName = "Bob", lastName = "Smith" }
+      , balance = 100
+      , accountType = Platinum
+      , status = Suspended (fromTime 1175820019000) Voluntary
+      }
+    , { owner = { firstName = "Janet", lastName = "Smyth" }
+      , balance = 3000
+      , accountType = Platinum
+      , status = Active (fromTime 1175820019000)
+      }
+    ]
 
 
 fullName : Person -> String
@@ -55,7 +59,7 @@ statusToString status =
 
 
 main =
-    beginnerProgram { model = testAccount, view = view, update = update }
+    beginnerProgram { model = accounts, view = view, update = update }
 
 
 accountTypeButtons currentAccountType =
@@ -92,8 +96,7 @@ accountTypeButtons currentAccountType =
 view : Model -> Html Msg
 view model =
     div []
-        [ renderAccount model
-        , accountTypeButtons model.accountType
+        [ renderAccounts model
         ]
 
 
@@ -103,7 +106,7 @@ type Msg
 
 
 type alias Model =
-    Account
+    List Account
 
 
 update : Msg -> Model -> Model
@@ -127,6 +130,21 @@ accountBackgroundColor accountType =
 
         Platinum ->
             "grey"
+
+
+renderAccounts : List Account -> Html Msg
+renderAccounts accounts =
+    let
+        accountSections =
+            List.map renderAccount accounts
+
+        radioButtons =
+            List.map (\account -> accountTypeButtons account.accountType) accounts
+
+        finalSections =
+            List.map2 (\a b -> div [] [ a, b ]) accountSections radioButtons
+    in
+        div [] finalSections
 
 
 renderAccount account =
