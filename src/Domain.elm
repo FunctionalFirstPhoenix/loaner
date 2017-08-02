@@ -1,6 +1,16 @@
 module Domain exposing (..)
 
 import Date exposing (Date)
+import Dict exposing (Dict)
+
+
+type alias AccountId =
+    Int
+
+
+type alias Model =
+    { accounts : Dict AccountId Account
+    }
 
 
 type alias Person =
@@ -16,7 +26,8 @@ type alias LastName =
 
 
 type alias Account =
-    { owner : Person
+    { id : AccountId
+    , owner : Person
     , balance : Amount
     , accountType : AccountType
     , status : AccountStatus
