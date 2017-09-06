@@ -1,7 +1,7 @@
-{
-  "accounts": [
+[
       {
-        "owner": { firstName: "Bob", lastName: "Smith" },
+        "id": 0,
+        "owner": { "firstName": "Bob", "lastName": "Smith" },
         "balance": 100,
         "accountType": "Gold",
         "status": {
@@ -11,7 +11,8 @@
         }
       },
       {
-        "owner": { firstName: "Janet", lastName: "Smyth" },
+        "id": 1,
+        "owner": { "firstName": "Janet", "lastName": "Smyth" },
         "balance": 3000,
         "accountType": "Platinum",
         "status": {
@@ -20,4 +21,3 @@
         }
       }
   ]
-}
