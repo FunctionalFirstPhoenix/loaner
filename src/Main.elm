@@ -10,7 +10,7 @@ import Dict exposing (Dict, empty, insert)
 import Domain exposing (..)
 import Debug
 import Http exposing (Error)
-import Json.Decode exposing (list, int, string, float, nullable, Decoder)
+import Json.Decode exposing (list, int, string, float, nullable, Decoder, andThen, field)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 
 
@@ -59,10 +59,32 @@ accountDecoder =
         |> required "id" int
         |> required "owner" personDecoder
         |> required "balance" int
-        --|> required "accountType" accountTypeDecoder
-        |> hardcoded Gold
-        --|> required "accountStatus" accountStatusDecoder
+        |> required "accountType" accountTypeDecoder
         |> hardcoded (Active (fromTime 1175820019000))
+
+
+
+-- |> required "status" accountStatusDecoder
+
+
+accountTypeDecoder =
+    let
+        typeNameToAccountType typeName =
+            case typeName of
+                "Platinum" ->
+                    Json.Decode.succeed Platinum
+
+                "Gold" ->
+                    Json.Decode.succeed Gold
+
+                "Normal" ->
+                    Json.Decode.succeed Normal
+
+                _ ->
+                    Json.Decode.fail <| "Invalid account type" ++ typeName
+    in
+        string
+            |> andThen typeNameToAccountType
 
 
 personDecoder : Decoder Person
@@ -74,14 +96,33 @@ personDecoder =
 
 
 {-
-   accountTypeDecoder : Decoder AccountType
-   accountTypeDecoder =
-       hardcoded Gold
-
-
+   -- FIXME: TBD
+   accountStatusDecoder :
    accountStatusDecoder =
-       hardcoded (Active (fromTime 1175820019000))
+       -- field "type" (string |> andThen stringToStatusType)
+       field "type" string
 -}
+
+
+parseSuspensionReason : String -> Maybe SuspensionReason
+parseSuspensionReason reasonString =
+    case reasonString of
+        "PastDue" ->
+            Just PastDue
+
+        "RulesViolation" ->
+            Just RulesViolation
+
+        "Voluntary" ->
+            Just Voluntary
+
+        _ ->
+            Nothing
+
+
+
+--suspentionReason
+--  hardcoded (Active (fromTime 1175820019000))
 
 
 loadAccountData =
@@ -163,14 +204,17 @@ update msg model =
 
                 Ok accounts ->
                     let
-                        foo =
-                            Debug.log "" accounts
-                        accountList =
-                        -- this is broken because accounts is a List Account not
-                        -- a Dict Int Account, convert it first then assign
-                    in
+                        accountDict =
+                            List.foldl
+                                (\account d -> Dict.insert account.id account d)
+                                Dict.empty
+                                accounts
 
-                        ( { model | accounts = accountList }, Cmd.none )
+                        -- refactored to List.foldl
+                        -- Dict.fromList <|
+                        --     List.map (\account -> ( account.id, account )) accounts
+                    in
+                        ( { model | accounts = accountDict }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -183,10 +227,10 @@ accountBackgroundColor accountType =
             "white"
 
         Gold ->
-            "yellow"
+            "gold"
 
         Platinum ->
-            "grey"
+            "#E5E4E2"
 
 
 renderAccounts : Dict Int Account -> Html Msg
